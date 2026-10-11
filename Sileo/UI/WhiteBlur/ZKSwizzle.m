@@ -39,9 +39,10 @@ static Class classFromInfo(const char *info) {
     }
     
     char after_bracket[255];
-    memcpy(after_bracket, &info[bracket_index], strlen(info) - bracket_index - 1);
+    size_t after_len = strlen(info) - bracket_index - 1;
+    memcpy(after_bracket, &info[bracket_index], after_len);
     
-    for (NSUInteger i = 0; i < strlen(info); i++) {
+    for (NSUInteger i = 0; i < after_len; i++) {
         if (after_bracket[i] == ' ') {
             after_bracket[i] = '\0';
         }
@@ -188,7 +189,9 @@ static BOOL classIgnoresTypes(Class cls) {
     
     if (class_respondsToSelector(cls, @selector(_ZK_ignoreTypes))) {
         Class cls2 = class_createInstance(cls, 0);
-        return [cls2 _ZK_ignoreTypes];
+        BOOL ignores = [cls2 _ZK_ignoreTypes];
+        [(id)cls2 release];
+        return ignores;
     }
     
     return NO;
