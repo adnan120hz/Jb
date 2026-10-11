@@ -29,33 +29,9 @@ class AltIconTableViewController: UITableViewController {
         return UIImage(contentsOfFile: path.path) ?? UIImage()
     }
     
+    // Sileo demo (userland): only the stock green icon
     var icons = [
         AltIcon(displayName: "Stock", author: "Dennis Bednarz", key: nil, image: altImage("AppIcon60x60")),
-        AltIcon(displayName: "OG", author: "Dennis Bednarz", key: "OG", image: altImage("OG")),
-        AltIcon(displayName: "Pride", author: "emiyl0", key: "Pride", image: altImage("Pride")),
-        AltIcon(displayName: "Flower Sileo", author: "eugolonom", key: "FlowerSileo", image: altImage("FlowerSileo")),
-        AltIcon(displayName: "Cookie", author: "eugolonom", key: "Cookie", image: altImage("Cookie")),
-        AltIcon(displayName: "Dopamine", author: "eugolonom", key: "Dopamine", image: altImage("Dopamine")),
-        AltIcon(displayName: "palera1n", author: "eugolonom", key: "palera1n", image: altImage("palera1n")),
-        AltIcon(displayName: "Cheyote", author: "eugolonom", key: "Cheyote", image: altImage("Cheyote")),
-        AltIcon(displayName: "Odyssey", author: "eugolonom", key: "Odyssey", image: altImage("Odyssey")),
-        AltIcon(displayName: "Electra", author: "eugolonom", key: "Electra", image: altImage("Electra")),
-        AltIcon(displayName: "Mixture", author: "Eilionoir Tunnicliff", key: "Mixture", image: altImage("Mixture")),
-        AltIcon(displayName: "Midnight", author: "Eilionoir Tunnicliff", key: "Midnight", image: altImage("Midnight")),
-        AltIcon(displayName: "Taurine", author: "Alpha_Stream", key: "Taurine", image: altImage("Taurine")),
-        AltIcon(displayName: "Chimera", author: "Korfi", key: "Chimera", image: altImage("Chimera")),
-        AltIcon(displayName: "Procursus", author: "Korfi", key: "Procursus", image: altImage("Procursus")),
-        AltIcon(displayName: "Dark Magic", author: "eugolonom", key: "DarkMagic", image: altImage("DarkMagic")),
-        AltIcon(displayName: "Hazel", author: "eugolonom", key: "Hazel", image: altImage("Hazel")),
-        AltIcon(displayName: "Stardust", author: "eugolonom", key: "Stardust", image: altImage("Stardust")),
-        AltIcon(displayName: "Sugar Free", author: "Alpha_Stream", key: "SugarFree", image: altImage("SugarFree")),
-        AltIcon(displayName: "Mango Crazy", author: "Alpha_Stream", key: "MangoCrazy", image: altImage("MangoCrazy")),
-        AltIcon(displayName: "Cool Breeze", author: "Alpha_Stream", key: "CoolBreeze", image: altImage("CoolBreeze")),
-        AltIcon(displayName: "Blue Lemonade", author: "Alpha_Stream ", key: "BlueLemonade", image: altImage("BlueLemonade")),
-        AltIcon(displayName: "Cotton Candy", author: "emiyl0", key: "CottonCandy", image: altImage("CottonCandy")),
-        AltIcon(displayName: "Strawberry Sunset", author: "Korfi", key: "StrawberrySunset", image: altImage("StrawberrySunset")),
-        AltIcon(displayName: "Oceanic Blue", author: "Korfi", key: "OceanicBlue", image: altImage("OceanicBlue")),
-        AltIcon(displayName: "Sus", author: "emiyl0", key: "Sus", image: altImage("Sus"))
     ]
     
     @objc func updateSileoColors() {
@@ -70,10 +46,6 @@ class AltIconTableViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        if Bundle.main.bundleIdentifier == "org.coolstar.SileoNightly" {
-            icons.insert(AltIcon(displayName: "Nightly", author: "Alpha_Stream", key: "Nightly", image: AltIconTableViewController.altImage("Nightly")), at: 1)
-        }
 
         navigationItem.title = String(localizationKey: "Alternate_Icon_Title")
         self.tableView.separatorColor = .sileoSeparatorColor

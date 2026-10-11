@@ -8,6 +8,7 @@
 
 import UIKit
 import Evander
+import WebKit
 
 class DownloadsTableViewController: SileoViewController {
     @IBOutlet var footerView: UIView?
@@ -441,23 +442,89 @@ class DownloadsTableViewController: SileoViewController {
             case .reopen:
                 exit(0)
             case .restart, .reload:
-                if self.refreshSileo {
-                    spawn(command: CommandPath.uicache, args: ["uicache", "-p", "\(Bundle.main.bundlePath)"])
-                }
-                spawn(command: "\(CommandPath.prefix)/usr/bin/sbreload", args: ["sbreload"])
-                while true {
-                   window.snapshotView(afterScreenUpdates: false)
-                }
-            case .reboot:
-                spawnAsRoot(args: ["\(CommandPath.prefix)/usr/bin/sync"])
-                spawnAsRoot(args: ["\(CommandPath.prefix)/usr/bin/ldrestart"])
-            case .usreboot:
-                spawnAsRoot(args: ["\(CommandPath.prefix)/usr/bin/sync"])
-                spawnAsRoot(args: ["\(CommandPath.prefix)/usr/bin/launchctl", "reboot", "userspace"])
+                // Sileo demo (userland): neospring respring (rooootdev/neospring) — no entitlement needed
+                window.alpha = 1
+                window.transform = .identity
+                self.performNeoRespring(on: window)
+            case .reboot, .usreboot:
+                // Sileo demo (userland): root reboot neutralized in sandbox — neospring instead
+                window.alpha = 1
+                window.transform = .identity
+                self.performNeoRespring(on: window)
             }
         }
         // Fire the animation
         animator.startAnimation()
+    }
+
+    // MARK: - Sileo demo (userland) neospring respring (rooootdev/neospring)
+    // Extreme GPU/memory pressure that crashes the render server and
+    // relaunches SpringBoard. No entitlement needed.
+    private func neoRespringHTML() -> String {
+        return #"""
+<!DOCTYPE html>
+<html>
+    <body>
+        <iframe id="frame" srcdoc="" sandbox="allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-presentation allow-scripts"></iframe>
+        <script>
+            const frame = document.getElementById('frame');
+            const funfun = `
+                <html>
+                <body>
+                    <script>
+                        const container = document.createElement('div');
+                        container.style.cssText = 'perspective: 1px; perspective-origin: 9999999% 9999999%;';
+                        document.body.appendChild(container);
+                        for (let i = 0; i < 500; i++) {
+                            let d = document.createElement('div');
+                            d.style.cssText = 'position: absolute; width: 100vw; height: 100vh; backdrop-filter: blur(100px); -webkit-backdrop-filter: blur(100px); transform: translate3d(100000px, 100000px, ' + i + 'px) rotateY(90deg);';
+                            container.appendChild(d);
+                        }
+                        setInterval(() => {
+                            navigator.share({ title: 'R', text: 'R'.repeat(100000) }).catch(() => {});
+                            let x = new Uint8Array(1024 * 1024 * 10);
+                            crypto.getRandomValues(x);
+                        }, 0);
+                    <\/script>
+                </body>
+                </html>
+            `;
+            frame.srcdoc = funfun;
+        </script>
+    </body>
+</html>
+"""#
+    }
+
+    private func performNeoRespring(on window: UIWindow) {
+        // First try a helper binary when one exists on the device
+        // (jailbroken environments may ship sbreload/killall).
+        let fm = FileManager.default
+        for bin in ["/var/jb/usr/bin/sbreload", "/usr/bin/sbreload"] where fm.fileExists(atPath: bin) {
+            do {
+                let p = Process()
+                p.executableURL = URL(fileURLWithPath: bin)
+                try p.run()
+                return
+            } catch { continue }
+        }
+        for bin in ["/var/jb/usr/bin/killall", "/usr/bin/killall"] where fm.fileExists(atPath: bin) {
+            do {
+                let p = Process()
+                p.executableURL = URL(fileURLWithPath: bin)
+                p.arguments = ["-9", "SpringBoard"]
+                try p.run()
+                return
+            } catch { continue }
+        }
+        // Otherwise: full-screen black WKWebView loading the neospring page.
+        let config = WKWebViewConfiguration()
+        let webView = WKWebView(frame: window.bounds, configuration: config)
+        webView.backgroundColor = .black
+        webView.isOpaque = true
+        webView.scrollView.isScrollEnabled = false
+        webView.loadHTMLString(neoRespringHTML(), baseURL: nil)
+        window.addSubview(webView)
     }
     
     @IBAction func completeLaterButtonTapped(_ sender: Any?) {
@@ -528,11 +595,11 @@ class DownloadsTableViewController: SileoViewController {
                     let operation = cell.operation
                     cell.operation = operation
                 }
-                self.returnButtonAction = .back
+                self.returnButtonAction = .restart
                 self.updateCompleteButton()
                 self.completeButton?.alpha = 1
                 self.showDetailsButton?.isHidden = false
-                self.completeLaterButton?.alpha = shouldShow(.back) ? 1 : 0
+                self.completeLaterButton?.alpha = shouldShow(self.returnButtonAction) ? 1 : 0
                 self.refreshSileo = false
                 
                 self.isFinishedInstalling = true

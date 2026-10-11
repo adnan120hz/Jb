@@ -93,15 +93,10 @@ class SileoAppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerDe
         }
         self.updateTintColor()
         
-        // Force all view controllers to load now
-        for (index, controller) in (tabBarController.viewControllers ?? []).enumerated() {
-            _ = controller.view
-            if let navController = controller as? UINavigationController {
-                _ = navController.viewControllers[0].view
-            }
-            if index == 4 {
-                controller.tabBarItem._setInternalTitle(String(localizationKey: "Search_Page"))
-            }
+        // Sileo demo (userland): lazy-load view controllers instead of force-loading
+        // all of them at launch (faster startup, no lag).
+        if let controllers = tabBarController.viewControllers, controllers.count > 4 {
+            controllers[4].tabBarItem._setInternalTitle(String(localizationKey: "Search_Page"))
         }
     }
     

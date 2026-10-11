@@ -81,6 +81,11 @@ enum Jailbreak: String, Codable {
     }
     
     private init() {
+        // Sileo demo (userland): force a valid jailbreak identity so the app
+        // never reports "Unknown Jailbreak" on non-jailbroken devices.
+        self = .dopamine
+        return
+
         #if targetEnvironment(simulator)
         self = .simulator
         return
