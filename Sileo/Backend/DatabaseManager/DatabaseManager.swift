@@ -35,7 +35,15 @@ class DatabaseManager {
                                                  ])
         let databaseURL = sileoURL.appendingPathComponent("sileo.sqlite3")
         
-        guard let database = try? Connection(databaseURL.path) else {
+        let database: Connection
+        if let fileDatabase = try? Connection(databaseURL.path) {
+            database = fileDatabase
+        } else if let memoryDatabase = try? Connection(.inMemory) {
+            // Sileo demo (userland): no jailbreak filesystem, so the on-disk
+            // database may not be openable — fall back to in-memory instead
+            // of crashing at launch.
+            database = memoryDatabase
+        } else {
             fatalError("Database Connection failed")
         }
         self.database = database
