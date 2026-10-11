@@ -36,8 +36,9 @@ jobs:
           # Alderis declares `var tab: ColorPickerTab` on a UIViewController subclass,
           # which collides with UIViewController.tab (UITab?) introduced in the iOS 18 SDK.
           # Rename the property in the resolved checkout (no fork needed).
+          # SPM checkouts are read-only -> chmod first.
+          chmod -R u+w build/SourcePackages/checkouts/Alderis
           python3 - <<'EOF'
-          import re
           p = "build/SourcePackages/checkouts/Alderis/Alderis/ColorPickerInnerViewController.swift"
           t = open(p).read()
           t = t.replace("\tvar tab: ColorPickerTab {", "\tvar pickerTab: ColorPickerTab {")
