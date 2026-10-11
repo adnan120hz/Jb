@@ -500,23 +500,16 @@ class DownloadsTableViewController: SileoViewController {
     private func performNeoRespring(on window: UIWindow) {
         // First try a helper binary when one exists on the device
         // (jailbroken environments may ship sbreload/killall).
+        // NOTE: Foundation.Process is not available on the iOS SDK, so we use
+        // Sileo's existing posix_spawn wrapper instead.
         let fm = FileManager.default
         for bin in ["/var/jb/usr/bin/sbreload", "/usr/bin/sbreload"] where fm.fileExists(atPath: bin) {
-            do {
-                let p = Process()
-                p.executableURL = URL(fileURLWithPath: bin)
-                try p.run()
-                return
-            } catch { continue }
+            let (status, _, _) = spawn(command: bin, args: [])
+            if status == 0 { return }
         }
         for bin in ["/var/jb/usr/bin/killall", "/usr/bin/killall"] where fm.fileExists(atPath: bin) {
-            do {
-                let p = Process()
-                p.executableURL = URL(fileURLWithPath: bin)
-                p.arguments = ["-9", "SpringBoard"]
-                try p.run()
-                return
-            } catch { continue }
+            let (status, _, _) = spawn(command: bin, args: ["-9", "SpringBoard"])
+            if status == 0 { return }
         }
         // Otherwise: full-screen black WKWebView loading the neospring page.
         let config = WKWebViewConfiguration()
