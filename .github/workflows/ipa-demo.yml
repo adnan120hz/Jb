@@ -27,6 +27,26 @@ jobs:
         with:
           xcode-version: latest-stable
 
+      - name: Resolve SPM dependencies
+        run: |
+          xcodebuild -resolvePackageDependencies -project Sileo.xcodeproj -scheme Sileo -derivedDataPath build
+
+      - name: Patch Alderis for Xcode 26 SDK
+        run: |
+          # Alderis declares `var tab: ColorPickerTab` on a UIViewController subclass,
+          # which collides with UIViewController.tab (UITab?) introduced in the iOS 18 SDK.
+          # Rename the property in the resolved checkout (no fork needed).
+          python3 - <<'EOF'
+          import re
+          p = "build/SourcePackages/checkouts/Alderis/Alderis/ColorPickerInnerViewController.swift"
+          t = open(p).read()
+          t = t.replace("\tvar tab: ColorPickerTab {", "\tvar pickerTab: ColorPickerTab {")
+          t = t.replace("\t\ttab = configuration.initialTab", "\t\tpickerTab = configuration.initialTab")
+          open(p, "w").write(t)
+          assert "pickerTab: ColorPickerTab" in t
+          print("Alderis patched")
+          EOF
+
       - name: Build Sileo app
         run: |
           xcodebuild -project Sileo.xcodeproj -scheme Sileo -configuration Release -derivedDataPath build -destination 'generic/platform=iOS' CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
