@@ -45,6 +45,40 @@ jobs:
           print("Alderis patched")
           EOF
 
+      - name: Swap vendored liblzma for simulator SDK lib (record only)
+        run: |
+          # Deps/liblzma/liblzma.5.tbd only carries arm64-ios + macCatalyst slices
+          # (no ios-simulator), so a Simulator link fails with:
+          #   ld: building for 'iOS-simulator', but linking in dylib ... built for 'macOS macCatalyst'
+          # For this recording build only (ephemeral CI checkout), point the
+          # vendored stub at the simulator SDK's system liblzma instead.
+          # At runtime the simulator provides /usr/lib/liblzma.5.dylib from its
+          # shared cache, so the launch test is unaffected.
+          SDKROOT=$(xcrun --sdk iphonesimulator --show-sdk-path)
+          SRC=""
+          for f in "$SDKROOT/usr/lib/liblzma.5.tbd" "$SDKROOT/usr/lib/liblzma.tbd"; do
+            if [ -f "$f" ]; then SRC="$f"; break; fi
+          done
+          if [ -n "$SRC" ]; then
+            echo "Using SDK stub: $SRC"
+            cp "$SRC" Deps/liblzma/liblzma.5.tbd
+          else
+            echo "No SDK liblzma stub found; synthesizing simulator slices into vendored tbd"
+            python3 - <<'EOF'
+          p = "Deps/liblzma/liblzma.5.tbd"
+          t = open(p).read()
+          t = t.replace("install-name:    '@rpath/liblzma.5.dylib'",
+                        "install-name:    '/usr/lib/liblzma.5.dylib'")
+          # add simulator targets everywhere the tbd lists targets
+          t = t.replace("[ arm64-ios, x86_64-macos,",
+                        "[ arm64-ios, arm64-ios-simulator, x86_64-ios-simulator, x86_64-macos,")
+          open(p, "w").write(t)
+          assert "arm64-ios-simulator" in t and "/usr/lib/liblzma.5.dylib" in t
+          print("synthesized simulator tbd")
+          EOF
+          fi
+          grep -m1 'install-name' Deps/liblzma/liblzma.5.tbd
+
       - name: Build Sileo for Simulator
         run: |
           xcodebuild -project Sileo.xcodeproj -scheme Sileo -configuration Release -derivedDataPath build -destination 'generic/platform=iOS Simulator' CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO IPHONEOS_DEPLOYMENT_TARGET=12.0
