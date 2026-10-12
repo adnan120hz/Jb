@@ -118,7 +118,7 @@ jobs:
           xcrun simctl io "$UDID" recordVideo --codec=h264 sileo-demo.mp4 &
           REC_PID=$!
           sleep 3
-          xcrun simctl launch "$UDID" org.coolstar.SileoStore || true
+          xcrun simctl launch "$UDID" com.amywhile.sileo || true
           sleep 25
           kill -INT $REC_PID || true
           wait $REC_PID || true
