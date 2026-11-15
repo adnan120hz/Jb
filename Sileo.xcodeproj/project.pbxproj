@@ -31,6 +31,7 @@
 		20F34B6B8BF8860872D112B6 /* Store.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756544AE91DEBEC3ED083841 /* Store.swift */; };
 		218C4F01B41159A1C3E2DDCB /* Dusk.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBE540548F66D6E5A0E1E1BE /* Dusk.swift */; };
 		2409499AB513D3625C22B863 /* Repo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F484E938B2DF7C7DBF78E94 /* Repo.swift */; };
+		26544601879006CAECFB7018 /* UIColor+CSS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A894C5CB5C1E56BA6453E1F /* UIColor+CSS.swift */; };
 		27A641AC9E2B913369347678 /* PackageListManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D9B4516A107EDB63E4F8B91 /* PackageListManager.swift */; };
 		2A844A0BBED9215A92C8C6CF /* DownloadPackage.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE234A618733F8FE6D84E43D /* DownloadPackage.swift */; };
 		2DC4472DBC58FBC210F78F1B /* Download.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D124D39851DA6BD85FCF04E /* Download.swift */; };
@@ -91,6 +92,7 @@
 		96A447AABC63C517ECB12AC3 /* Bootstrap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 847F42AEB69631FA54633F61 /* Bootstrap.swift */; };
 		9B1845E0843396C1F8261AA0 /* CommandPaths.swift in Sources */ = {isa = PBXBuildFile; fileRef = F43C43CA8270268F48027463 /* CommandPaths.swift */; };
 		9F504C84AFD66AE755C6A1B1 /* UIPasteboard+Sources.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD7248C4A331BEA065ED1CDB /* UIPasteboard+Sources.swift */; };
+		A0FB46689ED3264DBB1C23A2 /* UIColor+CSS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 803746EAB4971AB9447452D0 /* UIColor+CSS.swift */; };
 		A4F146F183FD04B2AB7C4DCE /* CSTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8415467BB9B89512728FFAD2 /* CSTextView.swift */; };
 		A56A42C388B7E484B1CD8AF9 /* Payment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24324EFCB7FA0431F4EC03F8 /* Payment.swift */; };
 		A56F4FA082E823A2B72A3C4B /* URLManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12E649AC841909A8C10F2ED1 /* URLManager.swift */; };
@@ -114,6 +116,7 @@
 		C373924A21D5F80300E6F704 /* Categories.strings in Resources */ = {isa = PBXBuildFile; fileRef = C373924721D5F80300E6F704 /* Categories.strings */; };
 		C373925921D60B2600E6F704 /* Localizable.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = C373925721D60B2600E6F704 /* Localizable.stringsdict */; };
 		C3D58BDA21D728BD001E0ABE /* NewsArticleCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C3D58BD821D728BD001E0ABE /* NewsArticleCollectionViewCell.xib */; };
+		C613463C9762A28DD9871105 /* UIColor+CSS.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0224429BFFEB02A495CF47F /* UIColor+CSS.swift */; };
 		C7EA481DB3A929F6F7BC9BC1 /* CSActionItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B274DC2AF85822655FCC1BF /* CSActionItem.swift */; };
 		C92F49B8918D3A785CC45873 /* DPKGArchitecture.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2754B0A859512ED2289172B /* DPKGArchitecture.swift */; };
 		CB5647F2B1D082E37D7FF0F2 /* URLManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12E649AC841909A8C10F2ED1 /* URLManager.swift */; };
@@ -615,6 +618,7 @@
 		172B2ED422F08F8E000155B9 /* LicensesTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LicensesTableViewController.swift; sourceTree = "<group>"; };
 		172B2ED622F09E8F000155B9 /* FlaggedSourceWarningViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlaggedSourceWarningViewController.swift; sourceTree = "<group>"; };
 		1761F826227B5ADD00E03DC3 /* Licenses.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Licenses.plist; sourceTree = "<group>"; };
+		1A894C5CB5C1E56BA6453E1F /* UIColor+CSS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "UIColor+CSS.swift"; path = "Sileo/Stubs/UIColor+CSS.swift"; sourceTree = SOURCE_ROOT; };
 		1B274DC2AF85822655FCC1BF /* CSActionItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CSActionItem.swift; path = Sileo/Stubs/CSActionItem.swift; sourceTree = SOURCE_ROOT; };
 		1B2E137026162CB1005C380C /* af */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = af; path = Sileo/af.lproj/Categories.strings; sourceTree = "<group>"; };
 		1B2E137126162CB1005C380C /* af */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = af; path = Sileo/af.lproj/Errors.strings; sourceTree = "<group>"; };
@@ -731,6 +735,7 @@
 		743D4FBFB9BA062EAC7DB260 /* RepoManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RepoManager.swift; path = Sileo/Stubs/RepoManager.swift; sourceTree = SOURCE_ROOT; };
 		756544AE91DEBEC3ED083841 /* Store.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Store.swift; path = Sileo/Stubs/Store.swift; sourceTree = SOURCE_ROOT; };
 		789E41B69E4C601506C96919 /* DownloadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DownloadManager.swift; path = Sileo/Stubs/DownloadManager.swift; sourceTree = SOURCE_ROOT; };
+		803746EAB4971AB9447452D0 /* UIColor+CSS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "UIColor+CSS.swift"; path = "Sileo/Stubs/UIColor+CSS.swift"; sourceTree = SOURCE_ROOT; };
 		8415467BB9B89512728FFAD2 /* CSTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CSTextView.swift; path = Sileo/Stubs/CSTextView.swift; sourceTree = SOURCE_ROOT; };
 		847F42AEB69631FA54633F61 /* Bootstrap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Bootstrap.swift; path = Sileo/Stubs/Bootstrap.swift; sourceTree = SOURCE_ROOT; };
 		9F484E938B2DF7C7DBF78E94 /* Repo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Repo.swift; path = Sileo/Stubs/Repo.swift; sourceTree = SOURCE_ROOT; };
@@ -738,6 +743,7 @@
 		A8A0EA4A2665AAC900CD772C /* libzstd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libzstd.h; sourceTree = "<group>"; };
 		AE234A618733F8FE6D84E43D /* DownloadPackage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DownloadPackage.swift; path = Sileo/Stubs/DownloadPackage.swift; sourceTree = SOURCE_ROOT; };
 		AE4B4310BFADA62DD8663CC4 /* ControlFileParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ControlFileParser.swift; path = Sileo/Stubs/ControlFileParser.swift; sourceTree = SOURCE_ROOT; };
+		B0224429BFFEB02A495CF47F /* UIColor+CSS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "UIColor+CSS.swift"; path = "Sileo/Stubs/UIColor+CSS.swift"; sourceTree = SOURCE_ROOT; };
 		B63544ABADC3821AF57271F4 /* RootWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RootWrapper.swift; path = Sileo/Stubs/RootWrapper.swift; sourceTree = SOURCE_ROOT; };
 		C2754B0A859512ED2289172B /* DPKGArchitecture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DPKGArchitecture.swift; path = Sileo/Stubs/DPKGArchitecture.swift; sourceTree = SOURCE_ROOT; };
 		C305468521D6900C003E73FC /* PackageListHeader.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PackageListHeader.xib; sourceTree = "<group>"; };
@@ -1066,6 +1072,9 @@
 				62DF4A679A4B00F92B59CF95 /* URL+Secure.swift */,
 				12E649AC841909A8C10F2ED1 /* URLManager.swift */,
 				4C534509BD73073B94F77F1E /* WishListManager.swift */,
+				1A894C5CB5C1E56BA6453E1F /* UIColor+CSS.swift */,
+				803746EAB4971AB9447452D0 /* UIColor+CSS.swift */,
+				B0224429BFFEB02A495CF47F /* UIColor+CSS.swift */,
 			);
 			name = Stubs;
 			sourceTree = "<group>";
@@ -2586,6 +2595,7 @@
 				526444C5BC93167583FD482E /* URL+Secure.swift in Sources */,
 				CB5647F2B1D082E37D7FF0F2 /* URLManager.swift in Sources */,
 				AFF64246A1C838C2F3A643B0 /* WishListManager.swift in Sources */,
+				C613463C9762A28DD9871105 /* UIColor+CSS.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2750,6 +2760,7 @@
 				75D84B54B2C5A5AABCDC15E5 /* URL+Secure.swift in Sources */,
 				A56F4FA082E823A2B72A3C4B /* URLManager.swift in Sources */,
 				2FB64B098DE4CB1EC5ADB9F8 /* WishListManager.swift in Sources */,
+				A0FB46689ED3264DBB1C23A2 /* UIColor+CSS.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2914,6 +2925,7 @@
 				A5E74B9595EC1813558642DC /* URL+Secure.swift in Sources */,
 				030740048681F6F8597C63A8 /* URLManager.swift in Sources */,
 				E7394BC28F0E5957CEE56992 /* WishListManager.swift in Sources */,
+				26544601879006CAECFB7018 /* UIColor+CSS.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
