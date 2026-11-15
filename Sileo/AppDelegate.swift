@@ -10,10 +10,6 @@ import Foundation
 import UserNotifications
 import Evander
 
-#if canImport(BackgroundTasks)
-import BackgroundTasks
-#endif
-
 @main
 class SileoAppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerDelegate {
     public var window: UIWindow?
@@ -29,12 +25,9 @@ class SileoAppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerDe
         // Prepare the Evander manifest
         Evander.prepare()
         SileoThemeManager.shared.updateUserInterface()
-        // Begin parsing sources files
-        _ = RepoManager.shared
-        // Init the local database
-        _ = PackageListManager.shared
-        _ = DatabaseManager.shared
-        _ = DownloadManager.shared
+        // Sileo demo (userland): no backend to initialise — no repo
+        // parsing, no package database, no download manager setup at
+        // launch. DownloadManager is created lazily by the tab bar.
         // Start the language helper for customised localizations
         _ = LanguageHelper.shared
 
@@ -66,15 +59,6 @@ class SileoAppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerDe
             }
         }
         
-        if #available(iOS 13.0, *) {
-            BGTaskScheduler.shared.register(forTaskWithIdentifier: "sileo.backgroundrefresh",
-                                            using: nil) { [weak self] task in
-                self?.handleRefreshTask(task as! BGAppRefreshTask)
-            }
-        } else {
-            UIApplication.shared.setMinimumBackgroundFetchInterval(4 * 3600)
-        }
-        
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) {_, _ in
             
         }
@@ -94,80 +78,6 @@ class SileoAppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerDe
         // all of them at launch (faster startup, no lag).
         if let controllers = tabBarController.viewControllers, controllers.count > 4 {
             controllers[4].tabBarItem._setInternalTitle(String(localizationKey: "Search_Page"))
-        }
-    }
-    
-    private func backgroundRepoRefreshTask(_ completion: @escaping () -> Void) {
-        DispatchQueue.global(qos: .userInitiated).async {
-            PackageListManager.shared.initWait()
-            let currentUpdates = PackageListManager.shared.availableUpdates().filter({ $0.1?.wantInfo != .hold }).map({ $0.0 })
-            let currentPackages = PackageListManager.shared.allPackagesArray
-            if currentUpdates.isEmpty { return completion() }
-            RepoManager.shared.update(force: false, forceReload: false, isBackground: true) { _, _ in
-                let newUpdates = PackageListManager.shared.availableUpdates().filter({ $0.1?.wantInfo != .hold }).map({ $0.0 })
-                let newPackages = PackageListManager.shared.allPackagesArray
-                if newPackages.isEmpty { return completion() }
-                
-                let diffUpdates = newUpdates.filter { !currentUpdates.contains($0) }
-                if diffUpdates.count > 3 {
-                    let content = UNMutableNotificationContent()
-                    content.title = String(localizationKey: "Updates Available")
-                    content.body = String(format: String(localizationKey: "New updates for %d packages are available"), diffUpdates.count)
-                    content.badge = newUpdates.count as NSNumber
-                    
-                    let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
-                    
-                    let request = UNNotificationRequest(identifier: "org.coolstar.sileo.updates", content: content, trigger: trigger)
-                    UNUserNotificationCenter.current().add(request, withCompletionHandler: nil)
-                } else {
-                    for package in diffUpdates {
-                        let content = UNMutableNotificationContent()
-                        content.title = String(localizationKey: "New Update")
-                        content.body = String(format: String(localizationKey: "%@ by %@ has been updated to version %@ on %@"),
-                                              package.name ?? "",
-                                              package.author?.name ?? "",
-                                              package.version,
-                                              package.sourceRepo?.displayName ?? "")
-                        content.badge = newUpdates.count as NSNumber
-                        
-                        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
-                        
-                        let request = UNNotificationRequest(identifier: "org.coolstar.sileo.update-\(package.package)",
-                                                            content: content,
-                                                            trigger: trigger)
-                        UNUserNotificationCenter.current().add(request, withCompletionHandler: nil)
-                    }
-                }
-
-                let diffPackages = newPackages.filter { !currentPackages.contains($0) }
-                let wishlist = WishListManager.shared.wishlist
-                for package in diffPackages {
-                    if wishlist.contains(package.package) {
-                        let content = UNMutableNotificationContent()
-                        content.title = String(localizationKey: "New Update")
-                        content.body = String(format: String(localizationKey: "%@ by %@ has been updated to version %@ on %@"),
-                                              package.name ?? "",
-                                              package.author?.name ?? "",
-                                              package.version,
-                                              package.sourceRepo?.displayName ?? "")
-                        content.badge = newUpdates.count as NSNumber
-                        
-                        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
-                        
-                        let request = UNNotificationRequest(identifier: "org.coolstar.sileo.update-\(package.package)",
-                                                            content: content,
-                                                            trigger: trigger)
-                        UNUserNotificationCenter.current().add(request, withCompletionHandler: nil)
-                    }
-                }
-                completion()
-            }
-        }
-    }
-    
-    func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        backgroundRepoRefreshTask {
-            completionHandler(.newData)
         }
     }
     
@@ -306,40 +216,10 @@ class SileoAppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerDe
     
     func applicationDidEnterBackground(_ application: UIApplication) {
         UIColor.isTransitionLockedForiOS13Bug = true
-        
-        if #available(iOS 13.0, *) {
-            scheduleTasks()
-        }
     }
     
     func applicationWillEnterForeground(_ application: UIApplication) {
         UIColor.isTransitionLockedForiOS13Bug = false
     }
     
-    @available(iOS 13.0, *)
-    private func handleRefreshTask(_ task: BGAppRefreshTask) {
-        func _return() {
-            task.setTaskCompleted(success: true)
-            scheduleRefreshTask()
-        }
-        backgroundRepoRefreshTask {
-            return _return()
-        }
-    }
-    
-    @available(iOS 13.0, *)
-    private func scheduleRefreshTask() {
-        let fetchTask = BGAppRefreshTaskRequest(identifier: "sileo.backgroundrefresh")
-        fetchTask.earliestBeginDate = Date(timeIntervalSinceNow: 4 * 3600)
-        do {
-            try BGTaskScheduler.shared.submit(fetchTask)
-        } catch {
-            print("Unable to submit task: \(error.localizedDescription)")
-        }
-    }
-    
-    @available(iOS 13.0, *)
-    private func scheduleTasks() {
-        scheduleRefreshTask()
-    }
 }

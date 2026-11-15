@@ -29,16 +29,6 @@
       shouldUseLaunchSchemeArgsEnv = "YES"
       shouldAutocreateTestPlan = "YES">
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E128199326BBFBA300D2553B"
-               BuildableName = "Sileo Backend Tests.xctest"
-               BlueprintName = "Sileo Backend Tests"
-               ReferencedContainer = "container:Sileo.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
