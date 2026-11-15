@@ -28,9 +28,6 @@ class SileoAppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerDe
         }
         // Prepare the Evander manifest
         Evander.prepare()
-        #if targetEnvironment(macCatalyst)
-        _ = MacRootWrapper.shared
-        #endif
         SileoThemeManager.shared.updateUserInterface()
         // Begin parsing sources files
         _ = RepoManager.shared

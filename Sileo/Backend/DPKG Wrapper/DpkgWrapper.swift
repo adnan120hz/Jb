@@ -66,12 +66,10 @@ class DpkgWrapper {
         #elseif arch(arm64) && os(macOS) && !targetEnvironment(simulator)
         let defaultArchitectures: DPKGArchitecture = DPKGArchitecture(primary: .applesilicon, foreign: [])
         #else
-        let defaultArchitectures: DPKGArchitecture
-        let prefix = CommandPath.prefix
-        switch prefix {
-        case "/var/jb": defaultArchitectures = DPKGArchitecture(primary: .rootless, foreign: [])
-        default: defaultArchitectures = DPKGArchitecture(primary: .rootful, foreign: [])
-        }
+        // Sileo demo (userland): the install prefix is always the stock
+        // one now (no rootless prefix exists in the demo), so the
+        // architecture default is always the rootful set.
+        let defaultArchitectures: DPKGArchitecture = DPKGArchitecture(primary: .rootful, foreign: [])
         #endif
         #if targetEnvironment(simulator) || TARGET_SANDBOX
         print("Default Archs: \(defaultArchitectures)")

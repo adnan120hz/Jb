@@ -175,12 +175,8 @@ else
 DPKG_TYPE ?= xz
 endif
 
-giveMeRoot/bin/giveMeRoot: giveMeRoot/giveMeRoot.c
-	$(MAKE) -C giveMeRoot \
-		CC="xcrun -sdk $(PLATFORM) clang -arch $(ARCH) -mios-version-min=11.0"
-		
 ifneq ($(MAC), 1)
-all:: giveMeRoot/bin/giveMeRoot
+all::
 else
 all ::
 endif
@@ -213,10 +209,7 @@ stage: all
 	
 	@rm -rf $(SILEO_STAGE_DIR)/$(PREFIX)/Applications/$(SILEO_APP)/_CodeSignature
 	@rm -rf $(SILEO_STAGE_DIR)/$(PREFIX)/Applications/$(SILEO_APP)/Frameworks
-	@cp giveMeRoot/bin/giveMeRoot $(SILEO_STAGE_DIR)/$(PREFIX)/Applications/$(SILEO_APP)/
 	@$(TARGET_CODESIGN) -SSileo/Entitlements.entitlements $(SILEO_STAGE_DIR)/$(PREFIX)/Applications/$(SILEO_APP)/
-	@$(TARGET_CODESIGN) -SgiveMeRoot/Entitlements.plist $(SILEO_STAGE_DIR)/$(PREFIX)/Applications/$(SILEO_APP)/giveMeRoot
-	@chmod 4755 $(SILEO_STAGE_DIR)/$(PREFIX)/Applications/$(SILEO_APP)/giveMeRoot
 else
 stage: all
 	@set -o pipefail; \
@@ -272,5 +265,4 @@ package: stage
 endif
 
 clean::
-	@$(MAKE) -C giveMeRoot clean
 	@rm -rf $(SILEOTMP)

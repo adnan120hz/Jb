@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import MachO
 
 enum Jailbreak: String, Codable {
     
@@ -54,156 +53,11 @@ enum Jailbreak: String, Codable {
     case other =             "Unknown Jailbreak"
     case simulator =         "Simulator"
     
-    fileprivate static func arch() -> String {
-        guard let archRaw = NXGetLocalArchInfo().pointee.name else {
-            return "arm64"
-        }
-        return String(cString: archRaw)
-    }
-    
-    // Supported for userspace reboots
-    static private let supported: Set<Jailbreak> = [
-        .chimera, .odyssey, .taurine,
-
-        .apex, .amethyst,
-        
-        .odysseyra1n, .checkra1n,
-        
-        .palera1n, .palera1n_rootful, .palera1n_rootless, .palera1n_legacy,
-        
-        .bakera1n, .bakera1n_rootful, .bakera1n_rootless,
-        
-        .fugu15, .dopamine
-    ]
-    
-    public var supportsUserspaceReboot: Bool {
-        Self.supported.contains(self)
-    }
-    
     private init() {
         // Sileo demo (userland): force a valid jailbreak identity so the app
         // never reports "Unknown Jailbreak" on non-jailbroken devices.
+        // No on-device jailbreak detection is performed: the filesystem
+        // probes for jailbreak marker files were removed for the demo.
         self = .dopamine
-        return
-
-        #if targetEnvironment(simulator)
-        self = .simulator
-        return
-        #endif
-                
-        let checkra1n = URL(fileURLWithPath: "/var/checkra1n.dmg")
-        let bakera1n = URL(fileURLWithPath: "/cores/binpack/.installed_overlay")
-        let palera1n = URL(fileURLWithPath: "/cores/jbloader")
-        let palera1n_Legacy = URL(fileURLWithPath: "/jbin/post.sh")
-        
-        let xina = URL(fileURLWithPath: "/var/jb/.installed_xina15")
-        let xina_Legacy = URL(fileURLWithPath: "/var/Liy/.procursus_strapped")
-        let fugu15_max = URL(fileURLWithPath: "/var/jb/.installed_fugu15max")
-        let dopamine = URL(fileURLWithPath: "/var/jb/.installed_dopamine")
-        
-        let apex = URL(fileURLWithPath: "/.installed_apex")
-        let amethyst = URL(fileURLWithPath: "/.installed_amethyst")
-        let unc0ver = URL(fileURLWithPath: "/.installed_unc0ver")
-        let taurine = URL(fileURLWithPath: "/taurine/jailbreakd")
-        let odyssey = URL(fileURLWithPath: "/odyssey/jailbreakd")
-        let chimera = URL(fileURLWithPath: "/chimera/jailbreakd")
-        let electra = URL(fileURLWithPath: "/electra/jailbreakd")
-        
-        let arm64e = Self.arch() == "arm64e"
-        
-        switch (true) {
-            
-            // bakera1n [rootful, rootless]
-        case bakera1n.exists && !arm64e:
-            if Bootstrap.procursus_rootless {
-                self = .bakera1n_rootless
-                return
-            } else if Bootstrap.procursus_rootful {
-                self = .bakera1n_rootful
-                return
-            } else {
-                self = .bakera1n
-            }
-            
-            // palera1n [rootful, rootless]
-        case palera1n.exists && !arm64e:
-            if Bootstrap.procursus_rootless {
-                self = .palera1n_rootless
-                return
-            } else if Bootstrap.procursus_rootful {
-                self = .palera1n_rootful
-                return
-            } else {
-                self = .palera1n
-            }
-            
-        case palera1n_Legacy.exists && !arm64e:
-            self = .palera1n_legacy
-            return
-            
-            // arm64e 15.0+ jailbreaks
-        case xina.exists && arm64e:
-            self = .xina15
-            return
-
-        case xina_Legacy.exists && arm64e:
-            self = .xina15_legacy
-            return
-            
-        case fugu15_max.exists && arm64e:
-            self = .fugu15
-            return
-            
-        case dopamine.exists:
-            self = .dopamine
-            return
-            
-            // 14.x- jailbreaks
-        case checkra1n.exists && !arm64e:
-            if Bootstrap.procursus_rootful {
-                self = .odysseyra1n
-                return
-            } else {
-                self = .checkra1n
-                return
-            }
-            
-        case apex.exists:
-            self = .apex
-            return
-            
-        case amethyst.exists:
-            self = .amethyst
-            return
-        
-        case unc0ver.exists:
-            self = .unc0ver
-            return
-            
-        case taurine.exists:
-            self = .taurine
-            return
-            
-            // 13.x- jailbreaks
-        case odyssey.exists:
-            self = .odyssey
-            return
-            
-        case chimera.exists:
-            self = .chimera
-            return
-            
-        case electra.exists:
-            self = .electra
-            return
-            
-        default:
-            #if targetEnvironment(macCatalyst)
-            self = .mac
-            return
-            #endif
-            self = .other
-            return
-        }
     }
 }

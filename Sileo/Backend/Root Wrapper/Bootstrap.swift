@@ -9,9 +9,13 @@
 import Foundation
 
 enum Bootstrap: String, Codable {
-        
-    static let procursus_rootless = URL(fileURLWithPath: "/var/jb/.procursus_strapped").exists
-    static let procursus_rootful = URL(fileURLWithPath: "/.procursus_strapped").exists
+    
+    // Sileo demo (userland): no bootstrap is ever detected from the
+    // filesystem. These are constants so callers that branch on the
+    // bootstrap keep compiling with the stock (non-jailbreak) values.
+    // The old bootstrap marker-file probes were removed for the demo.
+    static let procursus_rootless = false
+    static let procursus_rootful = false
     
     case procursus = "Procursus"
     case elucubratus = "Bingner/Elucubratus"
@@ -21,17 +25,15 @@ enum Bootstrap: String, Codable {
     case other_strap = "Unknown Bootstrap"
     
     init(jailbreak: Jailbreak) {
+        // Pure mapping from the (demo-forced) jailbreak identity.
+        // No filesystem reads and no bootstrap detection.
         switch jailbreak {
             
         case .electra:
             self = .electra_strap
             
         case .chimera:
-            if Bootstrap.procursus_rootful {
-                self = .procursus
-            } else {
-                self = .electra_strap
-            }
+            self = .electra_strap
             
         case .unc0ver, .checkra1n:
             self = .elucubratus
@@ -40,11 +42,7 @@ enum Bootstrap: String, Codable {
             self = .procursus
             
         case .palera1n_legacy, .palera1n_rootful, .palera1n_rootless, .bakera1n_rootful, .bakera1n_rootless:
-            if Bootstrap.procursus_rootful || Bootstrap.procursus_rootless {
-                self = .procursus
-            } else {
-                self = .other_strap
-            }
+            self = .other_strap
             
         case .xina15_legacy:
             self = .xinaa15_strap

@@ -116,11 +116,6 @@
 	<string>Sileo uses Face ID to quickly authenticate purchases.</string>
 	<key>SBAppUsesLocalNotifications</key>
 	<true/>
-	<key>SMPrivilegedExecutables</key>
-	<dict>
-		<key>SileoRootDaemon</key>
-		<string>identifier &quot;SileoRootDaemon&quot; and anchor apple generic and certificate leaf[subject.CN] = &quot;Apple Development: Amelia While (B2TU49334J)&quot; and certificate 1[field.1.2.840.113635.100.6.2.1] /* exists */</string>
-	</dict>
 	<key>UIApplicationShortcutItems</key>
 	<array>
 		<dict>

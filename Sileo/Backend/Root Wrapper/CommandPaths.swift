@@ -14,11 +14,10 @@ public class CommandPath {
         #if targetEnvironment(macCatalyst)
         return "/opt/procursus"
         #else
-        if Bootstrap.procursus_rootless {
-            return "/var/jb"
-        } else {
-            return ""
-        }
+        // Sileo demo (userland): always the stock prefix. The old
+        // rootless-prefix branch is gone (its condition can no longer
+        // be true in the demo).
+        return ""
         #endif
     }()
 
