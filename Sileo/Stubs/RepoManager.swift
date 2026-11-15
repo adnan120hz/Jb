@@ -17,7 +17,7 @@ final class RepoManager {
 
     private(set) var repoList: [Repo] = []
 
-    private init() {}
+    init() {}
 
     public func update(_ repo: Repo) {
         // Sileo demo (userland): no repos exist to update.

@@ -25,6 +25,11 @@ final class DatabaseManager {
     public func markAsSeen(_ dataPackage: Package) {
         // Sileo demo (userland): no database exists to record this in.
     }
+
+    public func stubsAtTimestamp(_ timestamp: Int64) -> [PackageStub] {
+        // Sileo demo (userland): no database exists; the News tab stays empty.
+        return []
+    }
 }
 
 extension UIDevice {

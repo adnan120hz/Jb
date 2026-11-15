@@ -286,7 +286,8 @@ final class DownloadManager {
         Self.aptQueue.async { [self] in
             var packages = packages
             let mapped = upgrades.map { $0.package.package }
-            packages.removeAll { mapped.contains($0.package) }
+            // NOTE: Set has no removeAll(where:) — filter + reassign instead.
+            packages = packages.filter { !mapped.contains($0.package) }
             for package in packages {
                 let downloadPackage = DownloadPackage(package: package)
                 let found = find(package: package.package)
