@@ -97,7 +97,6 @@
 		A56A42C388B7E484B1CD8AF9 /* Payment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24324EFCB7FA0431F4EC03F8 /* Payment.swift */; };
 		A56F4FA082E823A2B72A3C4B /* URLManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12E649AC841909A8C10F2ED1 /* URLManager.swift */; };
 		A5E74B9595EC1813558642DC /* URL+Secure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62DF4A679A4B00F92B59CF95 /* URL+Secure.swift */; };
-		A8A0EA4B2665AAC900CD772C /* libzstd.1.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = A8A0EA492665AAC900CD772C /* libzstd.1.tbd */; settings = {ATTRIBUTES = (Required, ); }; };
 		AAC34E47B55ADF211BED5890 /* APTWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22D42E8938E456534FA0C39 /* APTWrapper.swift */; };
 		AFF64246A1C838C2F3A643B0 /* WishListManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C534509BD73073B94F77F1E /* WishListManager.swift */; };
 		AFFB4B7B97C98836382E2222 /* PackageProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09A84C7AA6272A00A4D9E14C /* PackageProtocol.swift */; };
@@ -739,8 +738,6 @@
 		8415467BB9B89512728FFAD2 /* CSTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CSTextView.swift; path = Sileo/Stubs/CSTextView.swift; sourceTree = SOURCE_ROOT; };
 		847F42AEB69631FA54633F61 /* Bootstrap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Bootstrap.swift; path = Sileo/Stubs/Bootstrap.swift; sourceTree = SOURCE_ROOT; };
 		9F484E938B2DF7C7DBF78E94 /* Repo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Repo.swift; path = Sileo/Stubs/Repo.swift; sourceTree = SOURCE_ROOT; };
-		A8A0EA492665AAC900CD772C /* libzstd.1.tbd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.text-based-dylib-definition"; path = libzstd.1.tbd; sourceTree = "<group>"; };
-		A8A0EA4A2665AAC900CD772C /* libzstd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libzstd.h; sourceTree = "<group>"; };
 		AE234A618733F8FE6D84E43D /* DownloadPackage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DownloadPackage.swift; path = Sileo/Stubs/DownloadPackage.swift; sourceTree = SOURCE_ROOT; };
 		AE4B4310BFADA62DD8663CC4 /* ControlFileParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ControlFileParser.swift; path = Sileo/Stubs/ControlFileParser.swift; sourceTree = SOURCE_ROOT; };
 		B0224429BFFEB02A495CF47F /* UIColor+CSS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "UIColor+CSS.swift"; path = "Sileo/Stubs/UIColor+CSS.swift"; sourceTree = SOURCE_ROOT; };
@@ -1008,7 +1005,6 @@
 				E10C54592707DC92008BD0AA /* Evander in Frameworks */,
 				E172ACE7279490DF0066933E /* Down in Frameworks */,
 				E1D90DC02A30E77400F8CBAF /* Onboarding in Frameworks */,
-				A8A0EA4B2665AAC900CD772C /* libzstd.1.tbd in Frameworks */,
 				E19F95A0269245E4002ABB8C /* LNPopupController-Static in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1107,7 +1103,6 @@
 			children = (
 				E1CB21F827236B7D00B3141C /* DepictionKit */,
 				E12FC0D2269A3F7D008A0A36 /* liblz4 */,
-				E14C5E6726659CCA0080BFCE /* libzstd */,
 			);
 			name = Deps;
 			sourceTree = "<group>";
@@ -1360,16 +1355,6 @@
 				E13BD78E2646CFC1006A5EF2 /* SileoTeamViewController.swift */,
 			);
 			path = "Sileo Team";
-			sourceTree = "<group>";
-		};
-		E14C5E6726659CCA0080BFCE /* libzstd */ = {
-			isa = PBXGroup;
-			children = (
-				A8A0EA492665AAC900CD772C /* libzstd.1.tbd */,
-				A8A0EA4A2665AAC900CD772C /* libzstd.h */,
-			);
-			name = libzstd;
-			path = Deps/libzstd;
 			sourceTree = "<group>";
 		};
 		E14E4D6126DED566002AE3B4 /* NativePackageViewController */ = {
@@ -3134,7 +3119,6 @@
 				GCC_PREPROCESSOR_DEFINITIONS = "TARGET_SANDBOX=1";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/Deps/libzstd\"",
 					"\"$(SRCROOT)/Deps/liblz4",
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/Sileo/Info.plist";
@@ -3148,7 +3132,6 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
-					"$(PROJECT_DIR)/Deps/libzstd",
 					"$(PROJECT_DIR)/Deps/liblz4",
 				);
 				MARKETING_VERSION = 2.5.1;
@@ -3185,7 +3168,6 @@
 				GCC_PREPROCESSOR_DEFINITIONS = "TARGET_SANDBOX=1";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/Deps/libzstd\"",
 					"\"$(SRCROOT)/Deps/liblz4",
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/Sileo/Info.plist";
@@ -3199,7 +3181,6 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
-					"$(PROJECT_DIR)/Deps/libzstd",
 					"$(PROJECT_DIR)/Deps/liblz4",
 				);
 				MARKETING_VERSION = 2.5.1;
@@ -3235,7 +3216,6 @@
 				GCC_PREPROCESSOR_DEFINITIONS = "TARGET_SANDBOX=1";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/Deps/libzstd\"",
 					"\"$(SRCROOT)/Deps/liblz4",
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/Sileo/Info.plist";
@@ -3249,7 +3229,6 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
-					"$(PROJECT_DIR)/Deps/libzstd",
 					"$(PROJECT_DIR)/Deps/liblz4",
 				);
 				MARKETING_VERSION = 2.5.1;
@@ -3339,22 +3318,17 @@
 				ENABLE_BITCODE = NO;
 				"ENABLE_HARDENED_RUNTIME[sdk=macosx*]" = YES;
 				ENABLE_TESTABILITY = NO;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/Deps/libzstd\"",
-				);
+				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "$(SRCROOT)/Sileo/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				"IPHONEOS_DEPLOYMENT_TARGET[sdk=macosx*]" = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
-					/opt/procursus/lib,
 					"$(inherited)",
 					/usr/lib/libswift/stable,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
-					"$(PROJECT_DIR)/Deps/libzstd",
 					"$(PROJECT_DIR)/Deps/liblz4",
 				);
 				MARKETING_VERSION = 2.5.1;
@@ -3406,7 +3380,6 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
-					"$(PROJECT_DIR)/Deps/libzstd",
 					"$(PROJECT_DIR)/Deps/liblz4",
 				);
 				LLVM_LTO = YES;
@@ -3462,7 +3435,6 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
-					"$(PROJECT_DIR)/Deps/libzstd",
 					"$(PROJECT_DIR)/Deps/liblz4",
 				);
 				MARKETING_VERSION = 2.5.1;
@@ -3513,7 +3485,6 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
-					"$(PROJECT_DIR)/Deps/libzstd",
 					"$(PROJECT_DIR)/Deps/liblz4",
 				);
 				LLVM_LTO = YES;
@@ -3668,22 +3639,17 @@
 				ENABLE_BITCODE = NO;
 				"ENABLE_HARDENED_RUNTIME[sdk=macosx*]" = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/Deps/libzstd\"",
-				);
+				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "$(SRCROOT)/Sileo/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				"IPHONEOS_DEPLOYMENT_TARGET[sdk=macosx*]" = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
-					/opt/procursus/lib,
 					"$(inherited)",
 					/usr/lib/libswift/stable,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
-					"$(PROJECT_DIR)/Deps/libzstd",
 					"$(PROJECT_DIR)/Deps/liblz4",
 				);
 				MARKETING_VERSION = 2.5.1;
@@ -3725,22 +3691,17 @@
 				ENABLE_BITCODE = NO;
 				"ENABLE_HARDENED_RUNTIME[sdk=macosx*]" = YES;
 				ENABLE_TESTABILITY = NO;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/Deps/libzstd\"",
-				);
+				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "$(SRCROOT)/Sileo/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				"IPHONEOS_DEPLOYMENT_TARGET[sdk=macosx*]" = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
-					/opt/procursus/lib,
 					"$(inherited)",
 					/usr/lib/libswift/stable,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
-					"$(PROJECT_DIR)/Deps/libzstd",
 					"$(PROJECT_DIR)/Deps/liblz4",
 				);
 				MARKETING_VERSION = 2.5.1;

@@ -9,7 +9,6 @@
 import UIKit
 import Foundation
 import Evander
-import WebKit
 
 class DownloadsTableViewController: SileoViewController {
     @IBOutlet var footerView: UIView?
@@ -106,8 +105,8 @@ class DownloadsTableViewController: SileoViewController {
         
         confirmButton?.setTitle(String(localizationKey: "Queue_Confirm_Button"), for: .normal)
         cancelButton?.setTitle(String(localizationKey: "Queue_Clear_Button"), for: .normal)
-        completeButton?.setTitle(String(localizationKey: "After_Install_Respring"), for: .normal)
-        completeLaterButton?.setTitle(String(localizationKey: "After_Install_Respring_Later"), for: .normal)
+        completeButton?.setTitle(String(localizationKey: "Done"), for: .normal)
+        completeLaterButton?.setTitle(String(localizationKey: "Done"), for: .normal)
         showDetailsButton?.setTitle(String(localizationKey: "Show_Install_Details"), for: .normal)
         hideDetailsButton?.setTitle(String(localizationKey: "Hide_Install_Details"), for: .normal)
         cancelDownload?.setTitle(String(localizationKey: "Queue_Cancel_Downloads"), for: .normal)
@@ -422,105 +421,11 @@ class DownloadsTableViewController: SileoViewController {
     }
     
     @IBAction func completeButtonTapped(_ sender: Any?) {
-        if (returnButtonAction == .back || returnButtonAction == .uicache) && !refreshSileo {
-            completeLaterButtonTapped(sender)
-            return
-        }
-        
-        guard let window = UIApplication.shared.windows.first else { return completeLaterButtonTapped(sender) }
-        isFired = true
-        setNeedsStatusBarAppearanceUpdate()
-        let animator = UIViewPropertyAnimator(duration: 0.3, dampingRatio: 1) {
-            window.alpha = 0
-            window.transform = .init(scaleX: 0.9, y: 0.9)
-        }
-
-        // When the animation has finished, fire the dumb respring code
-        animator.addCompletion { _ in
-            switch self.returnButtonAction {
-            case .back, .uicache:
-                spawn(command: CommandPath.uicache, args: ["uicache", "-p", "\(Bundle.main.bundlePath)"]); exit(0)
-            case .reopen:
-                exit(0)
-            case .restart, .reload:
-                // Sileo demo (userland): neospring respring (rooootdev/neospring) — no entitlement needed
-                window.alpha = 1
-                window.transform = .identity
-                self.performNeoRespring(on: window)
-            case .reboot, .usreboot:
-                // Sileo demo (userland): root reboot neutralized in sandbox — neospring instead
-                window.alpha = 1
-                window.transform = .identity
-                self.performNeoRespring(on: window)
-            }
-        }
-        // Fire the animation
-        animator.startAnimation()
+        // Sileo demo (userland): finishing just dismisses,
+        // same as the "later" button.
+        completeLaterButtonTapped(sender)
     }
 
-    // MARK: - Sileo demo (userland) neospring respring (rooootdev/neospring)
-    // Extreme GPU/memory pressure that crashes the render server and
-    // relaunches SpringBoard. No entitlement needed.
-    private func neoRespringHTML() -> String {
-        return #"""
-<!DOCTYPE html>
-<html>
-    <body>
-        <iframe id="frame" srcdoc="" sandbox="allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-presentation allow-scripts"></iframe>
-        <script>
-            const frame = document.getElementById('frame');
-            const funfun = `
-                <html>
-                <body>
-                    <script>
-                        const container = document.createElement('div');
-                        container.style.cssText = 'perspective: 1px; perspective-origin: 9999999% 9999999%;';
-                        document.body.appendChild(container);
-                        for (let i = 0; i < 500; i++) {
-                            let d = document.createElement('div');
-                            d.style.cssText = 'position: absolute; width: 100vw; height: 100vh; backdrop-filter: blur(100px); -webkit-backdrop-filter: blur(100px); transform: translate3d(100000px, 100000px, ' + i + 'px) rotateY(90deg);';
-                            container.appendChild(d);
-                        }
-                        setInterval(() => {
-                            navigator.share({ title: 'R', text: 'R'.repeat(100000) }).catch(() => {});
-                            let x = new Uint8Array(1024 * 1024 * 10);
-                            crypto.getRandomValues(x);
-                        }, 0);
-                    <\/script>
-                </body>
-                </html>
-            `;
-            frame.srcdoc = funfun;
-        </script>
-    </body>
-</html>
-"""#
-    }
-
-    private func performNeoRespring(on window: UIWindow) {
-        // First try a helper binary when one exists on the device
-        // (jailbroken environments may ship sbreload/killall).
-        // NOTE: Foundation.Process is not available on the iOS SDK, so we use
-        // Sileo's existing posix_spawn wrapper instead.
-        let fm = FileManager.default
-        for bin in ["/var/jb/usr/bin/sbreload", "/usr/bin/sbreload"] where fm.fileExists(atPath: bin) {
-            let (status, _, _) = spawn(command: bin, args: [])
-            if status == 0 { return }
-        }
-        for bin in ["/var/jb/usr/bin/killall", "/usr/bin/killall"] where fm.fileExists(atPath: bin) {
-            let (status, _, _) = spawn(command: bin, args: ["-9", "SpringBoard"])
-            if status == 0 { return }
-        }
-        // Otherwise: full-screen black WKWebView loading the neospring page.
-        let config = WKWebViewConfiguration()
-        let webView = WKWebView(frame: window.bounds, configuration: config)
-        webView.backgroundColor = .black
-        webView.isOpaque = true
-        webView.scrollView.isScrollEnabled = false
-        webView.loadHTMLString(neoRespringHTML(), baseURL: nil)
-        window.addSubview(webView)
-    }
-    
     @IBAction func completeLaterButtonTapped(_ sender: Any?) {
         isInstalling = false
         isFinishedInstalling = false
@@ -687,8 +592,8 @@ class DownloadsTableViewController: SileoViewController {
             completeButton?.setTitle(String(localizationKey: "After_Install_Relaunch"), for: .normal)
             completeLaterButton?.setTitle(String(localizationKey: "After_Install_Relaunch_Later"), for: .normal)
         case .restart, .reload:
-            completeButton?.setTitle(String(localizationKey: "After_Install_Respring"), for: .normal)
-            completeLaterButton?.setTitle(String(localizationKey: "After_Install_Respring_Later"), for: .normal)
+            completeButton?.setTitle(String(localizationKey: "Done"), for: .normal)
+            completeLaterButton?.setTitle(String(localizationKey: "Done"), for: .normal)
         case .reboot:
             completeButton?.setTitle(String(localizationKey: "After_Install_Reboot"), for: .normal)
             completeLaterButton?.setTitle(String(localizationKey: "After_Install_Reboot_Later"), for: .normal)

@@ -2,8 +2,9 @@
 //
 // The real APTWrapper ran apt-get as root (persona override / setuid helper /
 // macOS root helper). That machinery is gone. performOperations reports failure
-// honestly and finishes with .restart so the existing Downloads UI offers the
-// neospring respring path. Nothing here claims an install succeeded.
+// honestly and finishes with .restart so the existing Downloads UI reaches
+// its completion state, which just dismisses. Nothing here claims an
+// install succeeded.
 
 import Foundation
 
@@ -50,8 +51,8 @@ class APTWrapper {
         // Report failure honestly instead of pretending the install
         // succeeded: status 1, no refresh, and a visible message in
         // the install log. Finish with .restart so the Downloads UI
-        // shows its existing Respring button (neospring), which is the
-        // only action this demo performs.
+        // reaches its completion state, which just dismisses.
+        // The demo performs no system action.
         outputCallback("Package installation is not available in this userland demo.\n", Int(STDOUT_FILENO))
         outputCallback("The demo queue is a UI demonstration only — no package was installed.\n", Int(STDOUT_FILENO))
         completionCallback(1, .restart, false)

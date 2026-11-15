@@ -2,17 +2,11 @@
 // and the APTBrokenPackage struct from Sileo/Backend/APT Wrapper/APTJsonParser.swift.
 //
 // The real DownloadManager downloaded .deb files, verified hashes and queued
-// apt operations. The demo has no repos and no downloads: the queue logic is
-// kept verbatim (same sets, same find/remove/add/verifyComplete semantics),
-// but startMoreDownloads SIMULATES a download completing — it marks the
-// queued demo entry success and reloads, so the existing Downloads UI flow
-// reaches the install step, which reports failure honestly via APTWrapper
-// and offers the neospring respring. No download is ever claimed real and
-// no package is ever claimed installed.
-//
-// The demo queue is seeded at init with ONE entry ("Demo Respring") so the
-// Downloads tab has something to show and the respring path is reachable.
-// removeAllItems clears it; relaunch re-seeds it.
+// apt operations. The demo has no repos and no downloads: the queue starts
+// empty and nothing can ever be queued, so the Downloads tab shows nothing.
+// The queue logic is kept verbatim (same sets, same find/remove/add/
+// verifyComplete semantics) so the existing Downloads UI compiles and runs.
+// Nothing is downloaded and nothing is installed.
 
 import Foundation
 import UIKit
@@ -109,13 +103,6 @@ final class DownloadManager {
 
     init() {
         viewController = DownloadsTableViewController(nibName: "DownloadsTableViewController", bundle: nil)
-        // Seed the demo queue with one entry so the Downloads tab can show
-        // the flow and the respring trigger is reachable. This is demo data
-        // only — it is not a real package and is never installed.
-        let demoPackage = Package(package: "com.sileo.demo-respring", version: "1.0")
-        demoPackage.name = "Demo Respring"
-        demoPackage.packageDescription = "Demo queue entry. Confirm runs the demo flow and offers a respring — nothing is installed."
-        installations.insert(DownloadPackage(package: demoPackage))
     }
 
     public func installingPackages() -> Int {
@@ -340,7 +327,7 @@ final class DownloadManager {
                 // Sileo demo (userland): there is no .deb to fetch, so the
                 // download is SIMULATED as complete. This only lets the
                 // existing Downloads UI flow reach the install step, which
-                // then reports failure honestly and offers respring.
+                // then reports failure honestly.
                 // Nothing is downloaded and nothing is installed.
                 download.queued = true
                 download.progress = 1
