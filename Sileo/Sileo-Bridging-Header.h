@@ -1,3 +1,4 @@
+#import <UIKit/UIKit.h>
 #import "WhiteBlur.h"
 
 #include <spawn.h>
