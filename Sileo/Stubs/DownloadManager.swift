@@ -152,6 +152,10 @@ final class DownloadManager {
                 UIApplication.shared.endBackgroundTask(backgroundTaskIdentifier)
             }
         }
+        for task in urlSessionTasks.values {
+            task.cancel()
+        }
+        urlSessionTasks.removeAll()
         downloads.removeAll()
         currentDownloads = 0
     }
@@ -169,6 +173,10 @@ final class DownloadManager {
                 UIApplication.shared.endBackgroundTask(backgroundTaskIdentifier)
             }
         }
+        for task in urlSessionTasks.values {
+            task.cancel()
+        }
+        urlSessionTasks.removeAll()
         downloads.removeAll()
         currentDownloads = 0
         // (The real removeAllItems re-ran checkInstalled() here; the demo
@@ -324,21 +332,96 @@ final class DownloadManager {
                     download = Download(package: package)
                     downloads[package.packageID] = download
                 }
-                // Sileo demo (userland): there is no .deb to fetch, so the
-                // download is SIMULATED as complete. This only lets the
-                // existing Downloads UI flow reach the install step, which
-                // then reports failure honestly.
-                // Nothing is downloaded and nothing is installed.
+                // Already started or finished — never start it twice.
+                guard !download.started, !download.completed else { continue }
+                guard let debURL = package.packageFileURL else {
+                    // Sileo demo (userland): no .deb URL for this package.
+                    download.queued = true
+                    download.failureReason = "No download URL for this package."
+                    download.completed = true
+                    download.success = false
+                    continue
+                }
+                // Sileo demo (userland): download the real .deb file over
+                // plain HTTPS into Documents/Downloads. This is a plain
+                // file download — no install happens (stock iOS has no
+                // dpkg). The install step still reports failure honestly.
+                currentDownloads += 1
                 download.queued = true
-                download.progress = 1
-                download.success = true
-                download.completed = true
+                download.started = true
+                startDownload(download, from: debURL)
             }
             // Same refresh the real completion path triggered, so the UI
             // re-checks verifyComplete and moves to the install step.
             reloadData(recheckPackages: false)
         }
     }
+
+    /// Real .deb download for one queued package.
+    private func startDownload(_ download: Download, from url: URL) {
+        let fileName = "\(download.package.package)_\(download.package.version).deb"
+        let downloadsDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+            .appendingPathComponent("Downloads", isDirectory: true)
+        try? FileManager.default.createDirectory(at: downloadsDir, withIntermediateDirectories: true)
+        let destination = downloadsDir.appendingPathComponent(fileName)
+        let task = URLSession.shared.downloadTask(with: url) { [weak self] tempURL, _, error in
+            guard let self = self else { return }
+            DownloadManager.aptQueue.async {
+                self.currentDownloads -= 1
+                self.urlSessionTasks.removeValue(forKey: download.package.packageID)
+                if let error = error {
+                    download.failureReason = error.localizedDescription
+                    download.success = false
+                } else if let tempURL = tempURL {
+                    do {
+                        if FileManager.default.fileExists(atPath: destination.path) {
+                            try FileManager.default.removeItem(at: destination)
+                        }
+                        try FileManager.default.moveItem(at: tempURL, to: destination)
+                        download.progress = 1
+                        download.totalBytesWritten = download.totalBytesExpectedToWrite
+                        download.success = true
+                        download.message = "Saved: \(fileName)"
+                    } catch {
+                        download.failureReason = error.localizedDescription
+                        download.success = false
+                    }
+                } else {
+                    download.failureReason = "Download failed."
+                    download.success = false
+                }
+                download.completed = true
+                self.reloadData(recheckPackages: false)
+            }
+        }
+        urlSessionTasks[download.package.packageID] = task
+        task.resume()
+        pollProgress(download, task: task)
+    }
+
+    /// Poll the task's progress and refresh the Downloads cell so the
+    /// progress bar moves while the .deb downloads.
+    private func pollProgress(_ download: Download, task: URLSessionTask) {
+        DispatchQueue.main.async {
+            let timer = Timer.scheduledTimer(withTimeInterval: 0.25, repeats: true) { [weak self] timer in
+                guard let self = self else { timer.invalidate(); return }
+                if download.completed || task.state == .completed {
+                    timer.invalidate()
+                    return
+                }
+                let progress = task.progress
+                download.totalBytesWritten = progress.completedUnitCount
+                download.totalBytesExpectedToWrite = progress.totalUnitCount
+                if progress.totalUnitCount > 0 {
+                    download.progress = CGFloat(progress.fractionCompleted)
+                }
+                self.viewController.reloadDownload(package: download.package)
+            }
+            _ = timer
+        }
+    }
+
+    private var urlSessionTasks: [String: URLSessionTask] = [:]
 
     public func download(package: String) -> Download? {
         downloads[package]

@@ -1,9 +1,10 @@
-// Sileo demo (userland) stub — replaces Sileo/Backend/Package Manager/PackageListManager.swift
+// Sileo demo (userland) — PackageListManager wired to real repo data.
 //
-// The real PackageListManager read the dpkg status file and repo Packages
-// files. The demo has no installed packages and no repos, so every lookup
-// returns nil/[] and initWait returns immediately (the real one waited on a
-// semaphore and fatalErrored on the main thread — the demo must do neither).
+// The demo fetches real repo Packages files (see RepoManager) and lists
+// them here. No dpkg status file exists on stock iOS, so installedPackages
+// stays empty and "Installed" is honestly empty; available updates are
+// therefore always []. Listing, search, categories (Tweaks, …) and
+// newest-version lookups all run on the real parsed packages.
 
 import Foundation
 import UIKit
@@ -28,8 +29,7 @@ final class PackageListManager {
     public var isLoaded = false
 
     public var allPackagesArray: [Package] {
-        // Sileo demo (userland): no packages exist anywhere.
-        return []
+        RepoManager.shared.repoList.flatMap { $0.packageArray }
     }
 
     private init() {}
@@ -39,7 +39,7 @@ final class PackageListManager {
     }
 
     public func repoInstallChange() {
-        // Sileo demo (userland): no repos exist.
+        // Sileo demo (userland): no installed packages to re-check.
     }
 
     public func installChange() {
@@ -73,25 +73,96 @@ final class PackageListManager {
     }
 
     class func package(packageEnum: ([String: String], PackageTags)) -> Package? {
-        // Sileo demo (userland): no package data exists to build from.
-        return nil
+        let (control, tags) = packageEnum
+        guard let identifier = control["package"], !identifier.isEmpty,
+              let version = control["version"], !version.isEmpty else { return nil }
+        let package = Package(package: identifier, version: version)
+        package.packageID = identifier
+        package.name = control["name"] ?? identifier
+        package.section = control["section"]
+        package.rawSection = control["section"]
+        package.architecture = control["architecture"]
+        package.packageDescription = control["description"]?.components(separatedBy: "\n").first
+        if let depiction = control["depiction"], let url = URL(string: depiction) {
+            package.depiction = url
+        }
+        if let depiction = control["sileodepiction"], let url = URL(string: depiction) {
+            package.nativeDepiction = url
+        }
+        if let icon = control["icon"], let url = URL(string: icon) {
+            package.icon = url
+        }
+        if let author = control["author"] {
+            package.author = Maintainer(string: author)
+        }
+        if let maintainer = control["maintainer"] {
+            package.maintainer = Maintainer(string: maintainer)
+        }
+        package.filename = control["filename"]
+        package.size = control["size"]
+        package.essential = control["essential"]
+        package.commercial = tags.contains(.commercial)
+        if let installedSize = control["installed-size"].flatMap(Int.init) {
+            package.installedSize = installedSize
+        }
+        package.tags = tags
+        package.rawControl = control
+        return package
     }
 
     public func packageList(identifier: String = "", search: String? = nil, sortPackages sort: Bool = false, repoContext: Repo? = nil, lookupTable: [String: [Package]]? = nil, packagePrepend: [Package]? = nil) -> [Package] {
-        // Sileo demo (userland): no packages exist to list.
-        return []
-    }
+        var packages: [Package]
+        switch identifier {
+        case "--installed", "--contextInstalled":
+            packages = packagePrepend ?? Array(installedPackages.values)
+        case "--wishlist":
+            let ids = WishListManager.shared.wishlist
+            packages = self.packages(identifiers: ids, sorted: false, repoContext: repoContext)
+        case let id where id.hasPrefix("category:"):
+            let wanted = String(id.dropFirst("category:".count))
+            let base = repoContext?.packageArray ?? allPackagesArray
+            packages = base.filter { Self.humanReadableCategory($0.section) == wanted }
+        default:
+            packages = repoContext?.packageArray ?? allPackagesArray
+        }
 
-    public func sortPackages(packages: [Package], search: String?) -> [Package] {
+        if let search = search, !search.isEmpty {
+            let needle = search.lowercased()
+            packages = packages.filter { package in
+                let haystacks = [package.name, package.package, package.packageDescription]
+                return haystacks.contains { $0?.lowercased().contains(needle) == true }
+            }
+        }
+
+        if sort {
+            packages = sortPackages(packages: packages, search: search)
+        }
         return packages
     }
 
+    public func sortPackages(packages: [Package], search: String?) -> [Package] {
+        packages.sorted(by: { ($0.name ?? $0.packageID).lowercased() < ($1.name ?? $1.packageID).lowercased() })
+    }
+
     public func newestPackage(identifier: String, repoContext: Repo?, packages: [Package]? = nil) -> Package? {
-        return nil
+        let candidates = (packages ?? repoContext?.packageArray ?? allPackagesArray)
+            .filter { $0.packageID == identifier }
+        var newest: Package?
+        for candidate in candidates {
+            if let current = newest {
+                if DpkgWrapper.isVersion(candidate.version, greaterThan: current.version) {
+                    newest = candidate
+                }
+            } else {
+                newest = candidate
+            }
+        }
+        return newest
     }
 
     public func installedPackage(identifier: String) -> Package? {
-        return nil
+        // Sileo demo (userland): nothing is installed on stock iOS.
+        return installedPackages[identifier]
     }
 
     public func package(url: URL) -> Package? {
@@ -101,11 +172,22 @@ final class PackageListManager {
     }
 
     public func packages(identifiers: [String], sorted: Bool, repoContext: Repo? = nil, packages: [Package]? = nil) -> [Package] {
-        return []
+        let base = packages ?? repoContext?.packageArray ?? allPackagesArray
+        var found: [Package] = []
+        for identifier in identifiers {
+            if let package = base.first(where: { $0.packageID == identifier }) {
+                found.append(package)
+            }
+        }
+        if sorted {
+            found = sortPackages(packages: found, search: nil)
+        }
+        return found
     }
 
     public func package(identifier: String, version: String, packages: [Package]? = nil) -> Package? {
-        return nil
+        let base = packages ?? allPackagesArray
+        return base.first { $0.packageID == identifier && $0.version == version }
     }
 
     public func upgradeAll() {

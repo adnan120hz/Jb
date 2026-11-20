@@ -39,8 +39,10 @@ class FeaturedInfoFooterView: FeaturedBaseView {
             }
         }
 
-        // Sileo demo (userland): force iOS 26.6.1 RC detection string
-        label.text = "\(platform) • \(systemPlatform) 26.6.1 RC (userland) • Sileo \(sileoVersion)\n\(Jailbreak.current.rawValue) • \(Jailbreak.bootstrap.rawValue)"
+        // Sileo demo (userland): show the real iOS version of this device
+        // (was hardcoded "26.6.1 RC"; the user is on 27.0.1).
+        let systemVersion = UIDevice.current.systemVersion
+        label.text = "\(platform) • \(systemPlatform) \(systemVersion) (userland) • Sileo \(sileoVersion)\n\(Jailbreak.current.rawValue) • \(Jailbreak.bootstrap.rawValue)"
         label.font = UIFont.systemFont(ofSize: 12)
         label.textColor = .lightGray
         label.numberOfLines = 3

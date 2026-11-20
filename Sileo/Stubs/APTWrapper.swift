@@ -48,13 +48,16 @@ class APTWrapper {
                                         outputCallback: @escaping (String, Int) -> Void,
                                         completionCallback: @escaping (Int, FINISH, Bool) -> Void) {
         // Sileo demo (userland): package installation is not available.
-        // Report failure honestly instead of pretending the install
-        // succeeded: status 1, no refresh, and a visible message in
-        // the install log. Finish with .restart so the Downloads UI
+        // The queued .deb files were downloaded to the app's
+        // Documents/Downloads folder (Files app > On My iPhone > Sileo >
+        // Downloads). Report failure honestly instead of pretending the
+        // install succeeded: status 1, no refresh, and a visible message
+        // in the install log. Finish with .restart so the Downloads UI
         // reaches its completion state, which just dismisses.
         // The demo performs no system action.
-        outputCallback("Package installation is not available in this userland demo.\n", Int(STDOUT_FILENO))
-        outputCallback("The demo queue is a UI demonstration only — no package was installed.\n", Int(STDOUT_FILENO))
+        outputCallback("Package installation is not available on stock iOS.\n", Int(STDOUT_FILENO))
+        outputCallback("The .deb files were saved to Documents/Downloads (Files app > On My iPhone > Sileo > Downloads).\n", Int(STDOUT_FILENO))
+        outputCallback("No package was installed.\n", Int(STDOUT_FILENO))
         completionCallback(1, .restart, false)
     }
 }
