@@ -19,7 +19,15 @@ final class RepoManager {
     static let shared = RepoManager()
 
     private static let savedSourcesKey = "SileoDemoSourceEntries"
-    private static let defaultSourceEntry = "deb https://havoc.app/ ./"
+    /// Default sources: Havoc + Chariz. Together they host every package
+    /// the remote Featured page lists — Chariz alone hosts the six Havoc
+    /// lacks (ntfy, Cylinder Reborn, EasySwipe, Glint, Bolders Reborn,
+    /// Jade), which otherwise show "Package Unavailable" with a greyed-out
+    /// GET button in Featured.
+    private static let defaultSourceEntries = [
+        "deb https://havoc.app/ ./",
+        "deb https://repo.chariz.com/ ./",
+    ]
 
     private(set) var repoList: [Repo] = []
 
@@ -27,8 +35,17 @@ final class RepoManager {
     private let session = URLSession(configuration: .default)
 
     init() {
-        let entries = UserDefaults.standard.stringArray(forKey: Self.savedSourcesKey)
-            ?? [Self.defaultSourceEntry]
+        var entries = UserDefaults.standard.stringArray(forKey: Self.savedSourcesKey)
+            ?? Self.defaultSourceEntries
+        // Migration: installs that already saved only Havoc gain Chariz.
+        var changed = false
+        for entry in Self.defaultSourceEntries where !entries.contains(entry) {
+            entries.append(entry)
+            changed = true
+        }
+        if changed {
+            UserDefaults.standard.set(entries, forKey: Self.savedSourcesKey)
+        }
         for entry in entries {
             if let repo = Self.repo(fromDebLine: entry) {
                 repoList.append(repo)
