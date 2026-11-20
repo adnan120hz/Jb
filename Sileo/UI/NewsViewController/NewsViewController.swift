@@ -76,6 +76,17 @@ class NewsViewController: SileoViewController, UICollectionViewDataSource, UICol
                                                name: NewsViewController.reloadNotification,
                                                object: nil)
         NotificationCenter.default.addObserver(weakSelf as Any, selector: #selector(self.reloadStates(_:)), name: PackageListManager.stateChange, object: nil)
+        // Sileo demo (userland): nothing posted ShowNews or reloaded the
+        // News tab before, so it spun forever. Reload when the bundled
+        // news articles arrive and when repos finish loading.
+        NotificationCenter.default.addObserver(weakSelf as Any,
+                                               selector: #selector(reloadData),
+                                               name: NewsResolver.ShowNews,
+                                               object: nil)
+        NotificationCenter.default.addObserver(weakSelf as Any,
+                                               selector: #selector(reloadData),
+                                               name: PackageListManager.reloadNotification,
+                                               object: nil)
     }
     
     @objc func reloadStates(_ notification: Notification) {
@@ -103,6 +114,11 @@ class NewsViewController: SileoViewController, UICollectionViewDataSource, UICol
         super.viewWillAppear(animated)
 
         updateSileoColors()
+        // Sileo demo (userland): load the tab on first open (nothing
+        // ever triggered loadNextBatch before, so it spun forever).
+        if sections.isEmpty {
+            reloadData()
+        }
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -157,6 +173,31 @@ extension NewsViewController { // Get Data
             
             let timestampsWeCareAbout = PackageStub.timestamps().sorted { $0 > $1 }
             if timestampsWeCareAbout.isEmpty {
+                // Sileo demo (userland): no package database exists, so
+                // the News tab would stay empty. Fill it with the loaded
+                // repo packages, grouped under today (capped, newest
+                // first by name). If repos haven't loaded yet, fall
+                // through to the empty state; the reloadNotification
+                // observer refills the tab when the fetch completes.
+                let all = PackageListManager.shared.allPackagesArray
+                if !all.isEmpty {
+                    let today = Int64(Date().timeIntervalSince1970)
+                    let sorted = packageListManager.sortPackages(packages: Array(all.prefix(100)), search: nil)
+                    DispatchQueue.main.async {
+                        self.sections = [today: sorted]
+                        self.timestamps = [today]
+                        self.collectionView.reloadData()
+                        if self.activityIndicatorView.isAnimating {
+                            FRUIView.animate(withDuration: 0.3, animations: {
+                                self.activityIndicatorView.alpha = 0
+                            }, completion: { _ in
+                                self.collectionView.isHidden = false
+                                self.activityIndicatorView.stopAnimating()
+                            })
+                        }
+                    }
+                    return
+                }
                 DispatchQueue.main.async {
                     if self.activityIndicatorView.isAnimating {
                         FRUIView.animate(withDuration: 0.3, animations: {

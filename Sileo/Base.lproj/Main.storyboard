@@ -133,7 +133,7 @@
                     <navigationItem key="navigationItem" id="ala-mv-cIg"/>
                     <userDefinedRuntimeAttributes>
                         <userDefinedRuntimeAttribute type="boolean" keyPath="showSearchField" value="NO"/>
-                        <userDefinedRuntimeAttribute type="string" keyPath="packagesLoadIdentifier" value="--installed"/>
+                        <userDefinedRuntimeAttribute type="string" keyPath="packagesLoadIdentifier" value="--allCategories"/>
                         <userDefinedRuntimeAttribute type="boolean" keyPath="showUpdates" value="YES"/>
                         <userDefinedRuntimeAttribute type="string" keyPath="localizableTitle" value="Packages_Page"/>
                         <userDefinedRuntimeAttribute type="boolean" keyPath="showWishlist" value="YES"/>
